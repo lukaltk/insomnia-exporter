@@ -1,0 +1,19 @@
+{
+  "name": "insomnia-exporter",
+  "version": "0.0.1",
+  "description": "Insomnia exporter for JSON format",
+  "main": "src/index.js",
+  "bin": {
+    "export": "bin/export.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "commander": "^8.2.0"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "dataToIgnore": {
+    "request_group": [
+      "test",
+      "tests",
+      "teste",
+      "testes"
+    ],
+    "environment": [
+      "error testing",
+      "errors testing"
+    ]
+  }
+}
