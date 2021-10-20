@@ -1,6 +1,5 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
-const { dataToIgnore } = require('../config.json');
 
 const EXPORT_FORMAT =  4;
 const EXPORTER_VERSION = 1;
@@ -15,8 +14,9 @@ const typeNameMapping = {
   "UnitTestSuite": "unit_test_suite"
 };
 
-function isDataToIgnore(data) {
+function isDataToIgnore(data, dataToIgnore) {
   if (!data.name) return false;
+  if (!dataToIgnore) return false;
   if (!dataToIgnore[data._type]) return false;
 
   const name = data.name.toLowerCase();
@@ -49,13 +49,13 @@ function parseInsomniaData(insomina_folder_path, data) {
   return parsedData;
 }
 
-function filterInsomniaData(data) {
+function filterInsomniaData(data, dataToIgnore) {
 
   const idToFilter = [];
   const idToSearch = [];
 
   data.forEach(element => {
-    if (isDataToIgnore(element)) {
+    if (isDataToIgnore(element, dataToIgnore)) {
       idToFilter.push(element._id);
       idToSearch.push(element._id);
     }
@@ -81,10 +81,13 @@ function filterInsomniaData(data) {
 }
 
 module.exports = {
-  exportInsomniaToJSON(insomina_folder_path) {
+  exportInsomniaToJSON(insomina_folder_path, config) {
+
+    const { dataToIgnore } = config;
+
     const data = findInsomniaData(insomina_folder_path);
     const parsedData = parseInsomniaData(insomina_folder_path, data);
-    const dataToExport = filterInsomniaData(parsedData);
+    const dataToExport = dataToIgnore ? filterInsomniaData(parsedData, dataToIgnore) : parsedData;
 
     const exportData = {
       _type: 'export',

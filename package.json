@@ -1,19 +1,28 @@
 {
-  "name": "insomnia-exporter",
+  "name": "@lukaltk/insomnia-exporter",
   "version": "0.0.1",
   "description": "Insomnia exporter for JSON format",
-  "main": "src/index.js",
+  "main": "./src/index.js",
   "bin": {
-    "export": "bin/export.js"
+    "@lukaltk/insomnia-exporter": "./bin/export.js",
+    "insomnia-exporter": "./bin/export.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "cli",
+    "export"
+  ],
+  "author": "Luka Takeshi Kato",
   "license": "ISC",
   "dependencies": {
-    "js-yaml": "^4.1.0",
-    "commander": "^8.2.0"
+    "chalk": "^4.1.2",
+    "commander": "^8.2.0",
+    "inquirer": "^8.2.0",
+    "js-yaml": "^4.1.0"
   }
 }
