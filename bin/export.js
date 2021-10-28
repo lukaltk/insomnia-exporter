@@ -44,7 +44,7 @@ function configureExporter(configPath) {
 
 program
   .option('-i, --input <path>', 'Location of' + chalk.blue.bold(' .insomnia ') + 'directory')
-  .option('-o, --output <path>', 'Where to save the' + chalk.blue.bold(' file') + '(defaults to current working directory)')
+  .option('-o, --output <path>', 'Where to save the' + chalk.blue.bold(' file ') + '(defaults to current working directory)')
   .option('-c, --config <path>', 'Location of config' + chalk.blue.bold(' file ') + '(JSON)')
   .action(async options => {
 
