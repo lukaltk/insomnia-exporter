@@ -1,6 +1,6 @@
 {
   "name": "insomnia-exporter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Insomnia exporter for JSON format",
   "main": "./src/index.js",
   "repository": "https://github.com/lukaltk/insomnia-exporter",
