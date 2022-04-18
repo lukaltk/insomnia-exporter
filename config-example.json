@@ -1,5 +1,5 @@
 {
-  "dataToIgnore": {
+  "blocklist": {
     "request_group": [
       "test",
       "tests",
@@ -8,7 +8,16 @@
     ],
     "environment": [
       "error testing",
-      "errors testing"
+      "errors testing",
+      "test",
+      "tests",
+      "teste",
+      "testes"
+    ]
+  },
+  "allowlist": {
+    "request_group": [
+      "integrations"
     ]
   }
 }

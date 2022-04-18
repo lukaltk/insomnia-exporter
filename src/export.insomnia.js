@@ -1,7 +1,7 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 
-const EXPORT_FORMAT =  4;
+const EXPORT_FORMAT = 4;
 const EXPORTER_VERSION = 1;
 
 const typeNameMapping = {
@@ -14,13 +14,13 @@ const typeNameMapping = {
   "UnitTestSuite": "unit_test_suite"
 };
 
-function isDataToIgnore(data, dataToIgnore) {
+function inListToFilter(data, list) {
   if (!data.name) return false;
-  if (!dataToIgnore) return false;
-  if (!dataToIgnore[data._type]) return false;
+  if (!list) return false;
+  if (!list[data._type]) return false;
 
   const name = data.name.toLowerCase();
-  return dataToIgnore[data._type].includes(name);
+  return list[data._type].includes(name);
 }
 
 function prettyJson(obj) {
@@ -28,8 +28,8 @@ function prettyJson(obj) {
 }
 
 function findInsomniaData(insomina_folder_path) {
-  const folders = fs.readdirSync(`${insomina_folder_path}`, {encoding: 'utf8'});
-  const subFolders = folders.map(folder => [folder, fs.readdirSync(`${insomina_folder_path}/${folder}`, {encoding: 'utf8'})]);
+  const folders = fs.readdirSync(`${insomina_folder_path}`, { encoding: 'utf8' });
+  const subFolders = folders.map(folder => [folder, fs.readdirSync(`${insomina_folder_path}/${folder}`, { encoding: 'utf8' })]);
   const data = Object.fromEntries(subFolders);
   if (data.UnitTest) delete data.UnitTest;
   if (data.UnitTestSuite) delete data.UnitTestSuite;
@@ -40,7 +40,7 @@ function parseInsomniaData(insomina_folder_path, data) {
   const parsedData = [];
   for (const files in data) {
     data[files].forEach(file => {
-      const exportFile = yaml.load(fs.readFileSync(`${insomina_folder_path}/${files}/${file}`, {encoding: 'utf8'}));
+      const exportFile = yaml.load(fs.readFileSync(`${insomina_folder_path}/${files}/${file}`, { encoding: 'utf8' }));
       exportFile._type = typeNameMapping[exportFile.type];
       delete exportFile.type;
       parsedData.push(exportFile);
@@ -49,31 +49,39 @@ function parseInsomniaData(insomina_folder_path, data) {
   return parsedData;
 }
 
-function filterInsomniaData(data, dataToIgnore) {
+function filterInsomniaData(data, blocklist, allowlist) {
 
   const idToFilter = [];
+  const idInAllowlist = [];
   const idToSearch = [];
 
   data.forEach(element => {
-    if (isDataToIgnore(element, dataToIgnore)) {
+    if (inListToFilter(element, blocklist)) {
       idToFilter.push(element._id);
       idToSearch.push(element._id);
+    } else if(inListToFilter(element, allowlist)) {
+      idToSearch.push(element._id);
+      idInAllowlist.push(element._id);
     }
   });
-
+  
   while (idToSearch.length > 0) {
     const id = idToSearch.pop();
-
+    
     const childIds = data.filter(element => {
       if (element.parentId === id) return true;
     }).map(element => element._id);
 
-    idToFilter.push(...childIds);
+    if(idInAllowlist.includes(id)) {
+      idInAllowlist.push(...childIds);
+    } else {
+      idToFilter.push(...childIds);
+    }
     idToSearch.push(...childIds);
   }
 
   const filteredData = data.filter(element => {
-    if (!idToFilter.includes(element._id)) return true;
+    if (!idToFilter.includes(element._id) || idInAllowlist.includes(element._id)) return true;
   });
 
   return filteredData;
@@ -83,11 +91,11 @@ function filterInsomniaData(data, dataToIgnore) {
 module.exports = {
   exportInsomniaToJSON(insomina_folder_path, config) {
 
-    const { dataToIgnore } = config;
+    const { blocklist, allowlist } = config;
 
     const data = findInsomniaData(insomina_folder_path);
     const parsedData = parseInsomniaData(insomina_folder_path, data);
-    const dataToExport = dataToIgnore ? filterInsomniaData(parsedData, dataToIgnore) : parsedData;
+    const dataToExport = blocklist ? filterInsomniaData(parsedData, blocklist, allowlist) : parsedData;
 
     const exportData = {
       _type: 'export',
@@ -98,7 +106,7 @@ module.exports = {
     };
 
     const exportJson = prettyJson(exportData);
-    
+
     return exportJson;
   }
 }
